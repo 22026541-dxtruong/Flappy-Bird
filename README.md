@@ -29,7 +29,7 @@ Flappy Bird là một trò chơi điện tử trên điện thoại, từng tr�
   - Sử dụng Sử dụng nhiều tính năng của thư viện SDL2 như đồ họa, âm thanh, hình ảnh, sự kiện, chữ,... 
   
 6.Tài liệu tham khảo  
-  - Lazyfoo  
+  - https://lazyfoo.net/  
   - Uet Courses  
   - Hình ảnh: https://www.pngegg.com/en/search?q=flappy+bird  
   - Phông chữ: https://www.wfonts.com/font/flappy-bird  
