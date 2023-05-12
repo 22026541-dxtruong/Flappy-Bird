@@ -199,129 +199,129 @@ int main(int argc, char* argv[]) {
 			file>>bs;
 			file.close();
 			while(true){
-			bool quit = false;
-			SDL_Event e;
-			Bird bird;
-			int n=0;
-			SDL_Rect exit1 = {142,459,79,28};
-			while(!quit){
-				while(SDL_PollEvent(&e)){
-					if(e.type == SDL_QUIT){
-						quit = true;
+				bool quit = false;
+				SDL_Event e;
+				Bird bird;
+				int n=0;
+				SDL_Rect exit1 = {142,459,79,28};
+				while(!quit){
+					while(SDL_PollEvent(&e)){
+						if(e.type == SDL_QUIT){
+							quit = true;
+						}
+						if(setMouse(e,exit1)){
+							close();
+							return 0;
+						}
+						if(e.type==SDL_MOUSEBUTTONDOWN){
+							Mix_PlayChannel(-1,swosh,0);
+							quit = true;
+						}
 					}
-					if(setMouse(e,exit1)){
-						close();
-						return 0;
+					SDL_SetRenderDrawColor(but,255,255,255,255);
+					SDL_RenderClear(but);
+					start.render(0,0,but);
+					flappyBird.render(SCREEN_WIDTH/4,SCREEN_HEIGHT/2,but,&imageBird[n/3]);
+					SDL_RenderPresent(but);
+					SDL_Delay(40);
+					n++;
+					if(n>6) n=0;
+				}
+				int t=0;
+				int s=0;
+				SDL_Color color={255,255,255};
+				quit = false;
+				int frame = 0;
+				while (!quit) {
+					while (SDL_PollEvent(&e) != 0) {
+						if (e.type == SDL_QUIT) {
+							quit = true;
+						}
+						bird.handleEvent(e,flap);
 					}
-					if(e.type==SDL_MOUSEBUTTONDOWN){
-						Mix_PlayChannel(-1,swosh,0);
-						quit = true;
+					bird.move();
+					if(t%50==0){
+						int y=rand()%(SCREEN_HEIGHT-220-220+1)+220;
+						Pipe x = Pipe(y);
+						pipe.push_back(x);
 					}
-				}
-				SDL_SetRenderDrawColor(but,255,255,255,255);
-				SDL_RenderClear(but);
-				start.render(0,0,but);
-				flappyBird.render(SCREEN_WIDTH/4,SCREEN_HEIGHT/2,but,&imageBird[n/3]);
-				SDL_RenderPresent(but);
-				SDL_Delay(40);
-				n++;
-				if(n>6) n=0;
-			}
-			int t=0;
-			int s=0;
-			SDL_Color color={255,255,255};
-			quit = false;
-			int frame = 0;
-			while (!quit) {
-				while (SDL_PollEvent(&e) != 0) {
-					if (e.type == SDL_QUIT) {
-						quit = true;
-					}
-					bird.handleEvent(e,flap);
-				}
-				bird.move();
-				if(t%50==0){
-					int y=rand()%(SCREEN_HEIGHT-220-220+1)+220;
-					Pipe x = Pipe(y);
-					pipe.push_back(x);
-				}
-				SDL_SetRenderDrawColor(but, 255, 255, 255, 255);
-				SDL_RenderClear(but);
-				background.render(frame,0, but);
-				background.render(SCREEN_WIDTH + frame, 0, but);
-				for(int i=0;i<pipe.size();i++){
-					pipe[i].render(but,pipe1,pipe2);
-					pipe[i].update();
-				}
-				if(!score.loadTTF(font,to_string(s),color,but)){
-					cout<<"score\n";
-				}
-				ground.render( frame, SCREEN_HEIGHT - 120,but);
-				ground.render(SCREEN_WIDTH+frame,SCREEN_HEIGHT-120,but);
-				bird.render(but,flappyBird,&imageBird[-frame%3]);
-				score.render(SCREEN_WIDTH/2-15,30,but);
-				SDL_RenderPresent(but);
-				SDL_Delay(40);
-				frame -= 1;
-				if (frame <= -SCREEN_WIDTH) frame = 0;
-				t++;
-				if(pipe[0].getRect1().x+Pipe::WIDTH<0){
-					pipe.erase(pipe.begin());
-				}
-				if(bird.getBird().x==pipe[0].getRect1().x){
-					Mix_PlayChannel(-1,point,0);
-					s++;
-				}
-				if(check(bird.getBird(),g_ground)||check(bird.getBird(),pipe[0].getRect1())||check(bird.getBird(),pipe[0].getRect2())){
-					Mix_PlayChannel(-1,die,0);
-					quit = true;
-				}
-			}
-			quit = false;
-			SDL_Rect restart = {56,432,79,27};
-			SDL_Rect exit2 = {225,433,79,26};
-			if(bs<s){
-				bs=s;
-				file.open("bestScore.txt");
-				file<<bs;
-				file.close();
-			}
-			while(!quit){
-				while(SDL_PollEvent(&e)){
-					if(e.type == SDL_QUIT){
-						quit = true;
-					}
-					if(setMouse(e,restart)){
-						pipe.clear();
-						quit = true;
-					}
-					if(setMouse(e,exit2)){
-						close();
-						return 0;
-					}
-				}
-				if(!check(bird.getBird(),g_ground)){
 					SDL_SetRenderDrawColor(but, 255, 255, 255, 255);
 					SDL_RenderClear(but);
 					background.render(frame,0, but);
 					background.render(SCREEN_WIDTH + frame, 0, but);
 					for(int i=0;i<pipe.size();i++){
 						pipe[i].render(but,pipe1,pipe2);
+						pipe[i].update();
+					}
+					if(!score.loadTTF(font,to_string(s),color,but)){
+						cout<<"score\n";
 					}
 					ground.render( frame, SCREEN_HEIGHT - 120,but);
 					ground.render(SCREEN_WIDTH+frame,SCREEN_HEIGHT-120,but);
-					bird.move();
 					bird.render(but,flappyBird,&imageBird[-frame%3]);
-					SDL_Delay(30);
-				}else{
-					gameOver.render(0,0,but);
-					score.render(170,215,but);
-					if(!bestScore.loadTTF(font,to_string(bs),color,but)){
-						cout<<"score\n";
+					score.render(SCREEN_WIDTH/2-15,30,but);
+					SDL_RenderPresent(but);
+					SDL_Delay(40);
+					frame -= 1;
+					if (frame <= -SCREEN_WIDTH) frame = 0;
+					t++;
+					if(pipe[0].getRect1().x+Pipe::WIDTH<0){
+						pipe.erase(pipe.begin());
 					}
-					bestScore.render(170,280,but);
+					if(bird.getBird().x==pipe[0].getRect1().x){
+						Mix_PlayChannel(-1,point,0);
+						s++;
+					}
+					if(check(bird.getBird(),g_ground)||check(bird.getBird(),pipe[0].getRect1())||check(bird.getBird(),pipe[0].getRect2())){
+						Mix_PlayChannel(-1,die,0);
+						quit = true;
+					}
 				}
-				SDL_RenderPresent(but);
+				quit = false;
+				SDL_Rect restart = {56,432,79,27};
+				SDL_Rect exit2 = {225,433,79,26};
+				if(bs<s){
+					bs=s;
+					file.open("bestScore.txt");
+					file<<bs;
+					file.close();
+				}
+				while(!quit){
+					while(SDL_PollEvent(&e)){
+						if(e.type == SDL_QUIT){
+							quit = true;
+						}
+						if(setMouse(e,restart)){
+							pipe.clear();
+							quit = true;
+						}
+						if(setMouse(e,exit2)){
+							close();
+							return 0;
+						}
+					}
+					if(!check(bird.getBird(),g_ground)){
+						SDL_SetRenderDrawColor(but, 255, 255, 255, 255);
+						SDL_RenderClear(but);
+						background.render(frame,0, but);
+						background.render(SCREEN_WIDTH + frame, 0, but);
+						for(int i=0;i<pipe.size();i++){
+							pipe[i].render(but,pipe1,pipe2);
+						}
+						ground.render( frame, SCREEN_HEIGHT - 120,but);
+						ground.render(SCREEN_WIDTH+frame,SCREEN_HEIGHT-120,but);
+						bird.move();
+						bird.render(but,flappyBird,&imageBird[-frame%3]);
+						SDL_Delay(30);
+					}else{
+						gameOver.render(0,0,but);
+						score.render(170,215,but);
+						if(!bestScore.loadTTF(font,to_string(bs),color,but)){
+							cout<<"score\n";
+						}
+						bestScore.render(170,280,but);
+					}
+					SDL_RenderPresent(but);
 				}
 			}
 		}
